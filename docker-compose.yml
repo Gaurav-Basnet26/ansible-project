@@ -25,7 +25,7 @@ services:
       - postgres
 
   employee-app:
-    image: gaurav0426/employee-management:v2
+    image: gaurav0426/employee-management:latest
     container_name: employee-app
     restart: always
     ports:
