@@ -7,14 +7,12 @@ services:
       POSTGRES_USER: employee
       POSTGRES_PASSWORD: employee123
     ports:
-    ports:
-  	- "15433:5432"
+      - "15433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: pgadmin
     restart: always
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@devops.com
@@ -26,7 +24,6 @@ services:
 
   employee-app:
     image: gaurav0426/employee-management:latest
-    container_name: employee-app
     restart: always
     ports:
       - "8089:8089"
