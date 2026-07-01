@@ -3,6 +3,7 @@ pipeline {
     agent any
 
     environment {
+        PATH = "/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
         IMAGE_NAME = "gaurav0426/employee-management"
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
@@ -29,7 +30,7 @@ pipeline {
 
         stage('Package') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                sh 'mvn package -DskipTests'
             }
         }
 
@@ -43,8 +44,8 @@ pipeline {
             steps {
                 sh '''
                     docker build \
-                        -t ${IMAGE_NAME}:${IMAGE_TAG} \
-                        -t ${IMAGE_NAME}:latest .
+                    -t ${IMAGE_NAME}:${IMAGE_TAG} \
+                    -t ${IMAGE_NAME}:latest .
                 '''
             }
         }
@@ -69,36 +70,16 @@ pipeline {
             }
         }
 
-        stage('Deploy with Ansible') {
+        // ✅ NEW STAGE (DEPLOYMENT)
+        stage('Deploy with Docker Compose') {
             steps {
                 sh '''
-                    echo "===== Workspace ====="
-                    pwd
-
-                    echo "===== Project Files ====="
-                    ls -R
-
-                    ansible --version
-
-                    ansible-playbook \
-                        -i ansible/inventory.ini \
-                        ansible/deploy.yml
+                    docker compose down
+                    docker compose pull employee-app
+                    docker compose up -d
                 '''
             }
         }
-    }
 
-    post {
-        success {
-            echo '================================='
-            echo 'Pipeline completed successfully!'
-            echo '================================='
-        }
-
-        failure {
-            echo '================================='
-            echo 'Pipeline failed!'
-            echo '================================='
-        }
     }
 }
