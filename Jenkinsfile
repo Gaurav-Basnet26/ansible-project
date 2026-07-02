@@ -43,8 +43,8 @@ pipeline {
             steps {
                 sh '''
                     docker build \
-                    -t ${IMAGE_NAME}:${IMAGE_TAG} \
-                    -t ${IMAGE_NAME}:latest .
+                        -t ${IMAGE_NAME}:${IMAGE_TAG} \
+                        -t ${IMAGE_NAME}:latest .
                 '''
             }
         }
@@ -52,11 +52,10 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
+                    credentialsId: 'jenkins-ansiblecred',
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-
                     sh '''
                         echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
@@ -73,8 +72,8 @@ pipeline {
             steps {
                 sh '''
                     ansible-playbook \
-                    -i ansible/inventory.ini \
-                    ansible/deploy.yml
+                        -i ansible/inventory.ini \
+                        ansible/deploy.yml
                 '''
             }
         }
@@ -82,11 +81,13 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline completed successfully!'
+            echo 'CI/CD Pipeline completed successfully!'
         }
-
         failure {
-            echo 'Pipeline failed!'
+            echo 'CI/CD Pipeline failed!'
+        }
+        always {
+            cleanWs()
         }
     }
 }
