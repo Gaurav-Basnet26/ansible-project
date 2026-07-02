@@ -3,7 +3,6 @@ pipeline {
     agent any
 
     environment {
-        PATH = "/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
         IMAGE_NAME = "gaurav0426/employee-management"
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
@@ -70,16 +69,24 @@ pipeline {
             }
         }
 
-        // ✅ NEW STAGE (DEPLOYMENT)
-        stage('Deploy with Docker Compose') {
+        stage('Deploy with Ansible') {
             steps {
                 sh '''
-                    docker compose down
-                    docker compose pull employee-app
-                    docker compose up -d
+                    ansible-playbook \
+                    -i ansible/inventory.ini \
+                    ansible/deploy.yml
                 '''
             }
         }
+    }
 
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+
+        failure {
+            echo 'Pipeline failed!'
+        }
     }
 }
